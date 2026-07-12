@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #141414;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden; /* Horizontal scroll band */
+}
+
+/* --- SCROLLBAR HIDE MAGIC (Ye Naya Hai) --- */
+
+/* Chrome, Safari, Edge, Opera ke liye */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Firefox ke liye */
+html, body {
+  scrollbar-width: none;
+}
+
+/* IE/Edge legacy ke liye */
+html, body {
+  -ms-overflow-style: none;
+}
