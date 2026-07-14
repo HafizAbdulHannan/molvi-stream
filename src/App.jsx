@@ -988,7 +988,7 @@ function App() {
               <div className="relative w-full bg-black" style={{ paddingBottom: '56.25%' }}>
                 <iframe 
                   src={selectedMovie.media_type === 'tv' || selectedMovie.first_air_date 
-                        ? `https://vidlink.pro/tv/${selectedMovie.id}` 
+                        ? `https://vidsrc.in/embed/tv/${selectedMovie.id}` 
                         : `https://multiembed.mov/?video_id=${selectedMovie.id}&tmdb=1`} 
                   className="absolute top-0 left-0 w-full h-full"
                   allowFullScreen={true}
