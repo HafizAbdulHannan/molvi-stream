@@ -85,6 +85,26 @@ function App() {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [resetEmail, setResetEmail] = useState(""); 
 
+  // --- MONETAG AD SYSTEM (1 Ad Per Day Logic) ---
+  useEffect(() => {
+    const today = new Date().toDateString(); 
+    const lastAdSeen = localStorage.getItem('molviLastAdSeen');
+
+    if (lastAdSeen !== today) {
+      const script = document.createElement('script');
+      script.dataset.zone = '11283515';
+      script.src = 'https://al5sm.com/tag.min.js';
+      script.async = true;
+      
+      document.body.appendChild(script);
+      
+      localStorage.setItem('molviLastAdSeen', today);
+      console.log("Monetag Ad System Active for today.");
+    } else {
+      console.log("User ne aaj ka ad dekh liya hai. No more ads today.");
+    }
+  }, []);
+
   // 1. Fetch Banner & Handle Firebase Persistent Authentication
   useEffect(() => {
     async function fetchBanner() {
@@ -964,22 +984,19 @@ function App() {
             </button>
 
             {isPlayerOpen ? (
-              /* MOBILE FIX: Added min-h-[250px] to prevent height collapse on phones */
-              <div className="aspect-video w-full bg-black min-h-[250px] md:min-h-[500px]">
-                {/* MOBILE FIX: Changed server to embed.su for both TV and Movies as it is much lighter and mobile-friendly */}
+              /* MOBILE FULLSCREEN FIX: Used paddingBottom 56.25% (16:9 ratio) and absolute positioning */
+              <div className="relative w-full bg-black" style={{ paddingBottom: '56.25%' }}>
                 <iframe 
                   src={selectedMovie.media_type === 'tv' || selectedMovie.first_air_date 
-                        ? `https://vidsrc.in/embed/tv/${selectedMovie.id}` 
+                        ? `https://vidlink.pro/tv/${selectedMovie.id}` 
                         : `https://multiembed.mov/?video_id=${selectedMovie.id}&tmdb=1`} 
-                  width="100%" 
-                  height="100%" 
+                  className="absolute top-0 left-0 w-full h-full"
                   allowFullScreen={true}
                   webkitallowfullscreen="true"
                   mozallowfullscreen="true"
                   allow="autoplay; fullscreen; picture-in-picture"
                   frameBorder="0"
                   scrolling="no"
-                  className="w-full h-full" 
                 />
               </div>
             ) : (
