@@ -111,20 +111,17 @@ function App() {
   const handleAdClick = () => {
     const today = new Date().toDateString();
     
-    // 1. Aaj ki date save kar lo taake dobara na aaye
+    // 1. Aaj ki date save kar lo taake dobara ad na aaye
     localStorage.setItem('molviLastAdSeen', today);
     
     // 2. Samne se prompt (black screen) hata do
     setShowAdPrompt(false);
 
-    // 3. Ad pop hone ke 2 second baad ad script ko website se delete kar do
+    // 3. Ad pop hone ke liye thora sa time (800ms) de kar page ko force reload kar do
+    // Reload karne se ad script browser ki memory se 100% wash ho jayegi aur player par dobara ad nahi aayega
     setTimeout(() => {
-      const adScript = document.getElementById('monetag-script');
-      if (adScript) {
-        adScript.remove();
-        console.log("Ad script removed completely.");
-      }
-    }, 2000);
+      window.location.reload();
+    }, 800);
   };
 
   // 1. Fetch Banner & Handle Firebase Persistent Authentication
