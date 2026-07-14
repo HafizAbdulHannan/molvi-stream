@@ -969,7 +969,7 @@ function App() {
                 {/* MOBILE FIX: Changed server to embed.su for both TV and Movies as it is much lighter and mobile-friendly */}
                 <iframe 
                   src={selectedMovie.media_type === 'tv' || selectedMovie.first_air_date 
-                        ? `https://embed.su/embed/tv/${selectedMovie.id}` 
+                        ? `https://vidsrc.in/embed/tv/${selectedMovie.id}` 
                         : `https://multiembed.mov/?video_id=${selectedMovie.id}&tmdb=1`} 
                   width="100%" 
                   height="100%" 
