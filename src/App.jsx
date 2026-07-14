@@ -969,11 +969,13 @@ function App() {
                 {/* MOBILE FIX: Changed server to embed.su for both TV and Movies as it is much lighter and mobile-friendly */}
                 <iframe 
                   src={selectedMovie.media_type === 'tv' || selectedMovie.first_air_date 
-                        ? `https://vidsrc.net/embed/tv?tmdb=${selectedMovie.id}` 
+                        ? `https://embed.su/embed/tv/${selectedMovie.id}` 
                         : `https://multiembed.mov/?video_id=${selectedMovie.id}&tmdb=1`} 
                   width="100%" 
                   height="100%" 
-                  allowFullScreen 
+                  allowFullScreen={true}
+                  webkitallowfullscreen="true"
+                  mozallowfullscreen="true"
                   allow="autoplay; fullscreen; picture-in-picture"
                   frameBorder="0"
                   scrolling="no"
