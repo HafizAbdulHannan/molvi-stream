@@ -71,6 +71,9 @@ function App() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState("");
 
+  // Ad Prompt State
+  const [showAdPrompt, setShowAdPrompt] = useState(false);
+
   // Password Visibility States
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
@@ -85,27 +88,44 @@ function App() {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [resetEmail, setResetEmail] = useState(""); 
 
-  // --- MONETAG AD SYSTEM (1 Ad Per Day Logic - Final Fix) ---
+  // --- MONETAG AD SYSTEM (1 Ad Per Day with Welcome Overlay) ---
   useEffect(() => {
     const today = new Date().toDateString(); 
     const lastAdSeen = localStorage.getItem('molviLastAdSeen');
 
-    // Agar aaj ad nahi dekha
+    // Agar aaj ad nahi dekha, to prompt show karo aur ad script load karo
     if (lastAdSeen !== today) {
-      // FIX: Fauran memory mein save karein taake React ghalti se 2 dafa script na lagaye
-      localStorage.setItem('molviLastAdSeen', today);
-
+      setShowAdPrompt(true); // Screen par block lag gaya
+      
       const script = document.createElement('script');
       script.dataset.zone = '11283515';
       script.src = 'https://al5sm.com/tag.min.js';
       script.async = true;
+      script.id = 'monetag-script';
       
       document.body.appendChild(script);
-      console.log("Monetag Ad System Active for today.");
-    } else {
-      console.log("User ne aaj ka ad dekh liya hai. No more ads today.");
     }
   }, []);
+
+  // Jab user "Click here to watch ad" wale button par click kare
+  const handleAdClick = () => {
+    const today = new Date().toDateString();
+    
+    // 1. Aaj ki date save kar lo taake dobara na aaye
+    localStorage.setItem('molviLastAdSeen', today);
+    
+    // 2. Samne se prompt (black screen) hata do
+    setShowAdPrompt(false);
+
+    // 3. Ad pop hone ke 2 second baad ad script ko website se delete kar do
+    setTimeout(() => {
+      const adScript = document.getElementById('monetag-script');
+      if (adScript) {
+        adScript.remove();
+        console.log("Ad script removed completely.");
+      }
+    }, 2000);
+  };
 
   // 1. Fetch Banner & Handle Firebase Persistent Authentication
   useEffect(() => {
@@ -523,6 +543,24 @@ function App() {
   return (
     <div className={`min-h-screen font-sans transition-colors duration-300 ${theme === 'dark' ? 'bg-[#141414] text-white selection:bg-red-600' : 'bg-gray-100 text-gray-900 selection:bg-red-500'}`}>
       
+      {/* 1 AD PER DAY OVERLAY PROMPT */}
+      {showAdPrompt && (
+        <div className="fixed inset-0 z-[9999] bg-black/95 flex flex-col items-center justify-center p-6 text-center backdrop-blur-xl">
+          <h2 className="text-3xl md:text-5xl font-black text-white mb-6 drop-shadow-2xl tracking-tight">
+            Welcome to <span className="text-red-600">MOLVI-Stream</span>
+          </h2>
+          <p className="text-gray-300 text-sm md:text-lg mb-10 max-w-xl leading-relaxed">
+            Humari is free streaming service ko support karne ke liye, baraye meharbani din mein sirf ek dafa ad dekhein. Click karne ke baad ad naye tab mein khulega aur website aap ke liye unlock ho jayegi.
+          </p>
+          <button 
+            onClick={handleAdClick}
+            className="bg-red-600 text-white px-8 py-5 rounded-full font-black text-lg md:text-xl hover:bg-red-700 hover:scale-105 transition-all shadow-[0_0_30px_rgba(220,38,38,0.6)] animate-pulse"
+          >
+            Click here to watch ad per day and continue
+          </button>
+        </div>
+      )}
+
       {/* NAVBAR */}
       <nav className={`fixed top-0 w-full p-4 z-[100] flex justify-between items-center backdrop-blur-sm ${theme === 'dark' ? 'bg-gradient-to-b from-black/90 to-transparent' : 'bg-white/90 shadow-md'}`}>
         <h1 className="text-red-600 text-2xl md:text-4xl font-black cursor-pointer tracking-tighter" onClick={() => setIsSearching(false)}>
