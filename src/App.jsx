@@ -85,43 +85,23 @@ function App() {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [resetEmail, setResetEmail] = useState(""); 
 
-  // --- MONETAG AD SYSTEM (1 Ad Per Day Logic - SPA Fixed) ---
+  // --- MONETAG AD SYSTEM (1 Ad Per Day Logic - Final Fix) ---
   useEffect(() => {
     const today = new Date().toDateString(); 
     const lastAdSeen = localStorage.getItem('molviLastAdSeen');
 
+    // Agar aaj ad nahi dekha
     if (lastAdSeen !== today) {
+      // FIX: Fauran memory mein save karein taake React ghalti se 2 dafa script na lagaye
+      localStorage.setItem('molviLastAdSeen', today);
+
       const script = document.createElement('script');
       script.dataset.zone = '11283515';
       script.src = 'https://al5sm.com/tag.min.js';
       script.async = true;
-      script.id = 'monetag-script'; // Takay hum isay easily nikal sakein
       
       document.body.appendChild(script);
       console.log("Monetag Ad System Active for today.");
-
-      // SPA FIX: Jab pehli dafa click ho, to uske baad ad script ko DOM se nikal do
-      const handleFirstClick = () => {
-        localStorage.setItem('molviLastAdSeen', today);
-        
-        // 2 second ka time diya taake ad safely open ho jaye, phir script ko delete kar diya
-        setTimeout(() => {
-          const adScript = document.getElementById('monetag-script');
-          if (adScript) {
-            adScript.remove();
-            console.log("Ad script removed from DOM to prevent multiple pops.");
-          }
-        }, 2000);
-
-        // Mazeed clicks record na hon, is liye listener hata diya
-        document.removeEventListener('click', handleFirstClick);
-      };
-
-      document.addEventListener('click', handleFirstClick);
-
-      return () => {
-        document.removeEventListener('click', handleFirstClick);
-      };
     } else {
       console.log("User ne aaj ka ad dekh liya hai. No more ads today.");
     }
