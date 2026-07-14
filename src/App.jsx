@@ -13,7 +13,6 @@ const BASE_URL = "https://api.themoviedb.org/3";
 const IMAGE_BASE = "https://image.tmdb.org/t/p/original";
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/xrenzogq";
 
-// UPDATED: Added Indian, Pakistani, Web Series, and Anime requests
 const requests = [
   { title: "Trending Now", url: `/trending/all/week?api_key=${API_KEY}`, isLarge: true },
   { title: "Netflix Originals", url: `/discover/tv?api_key=${API_KEY}&with_networks=213` },
@@ -91,7 +90,6 @@ function App() {
     async function fetchBanner() {
       try {
         const res = await axios.get(`${BASE_URL}${requests[0].url}`);
-        // Filter out unreleased movies from hero banner selection
         const releasedOnly = res.data.results.filter(m => !isComingSoon(m.release_date || m.first_air_date));
         if (releasedOnly.length > 0) {
           setMovie(releasedOnly[Math.floor(Math.random() * releasedOnly.length)]);
@@ -104,10 +102,8 @@ function App() {
     }
     fetchBanner();
 
-    // FIREBASE AUTH STATE LISTENER (Auto Login/Persistence)
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user && user.emailVerified) {
-        // Fetch detailed profile from Firestore
         const userSnap = await getDoc(doc(db, "users", user.email));
         if (userSnap.exists()) {
           setCurrentUser(userSnap.data());
@@ -140,17 +136,15 @@ function App() {
           const history = data.watchHistory || [];
           if (history.length > 0) {
             const lastItem = history[history.length - 1];
-            const lastId = lastItem?.id || lastItem; // Supports old string IDs and new object IDs
+            const lastId = lastItem?.id || lastItem;
             const itemType = lastItem?.type || 'movie'; 
 
             const detailRes = await axios.get(`${BASE_URL}/${itemType}/${lastId}?api_key=${API_KEY}`);
             setLastWatchedMovieName(detailRes.data.title || detailRes.data.name);
 
             const recRes = await axios.get(`${BASE_URL}/${itemType}/${lastId}/recommendations?api_key=${API_KEY}`);
-            // FILTER: History recommendations can only contain released movies
             const releasedRecs = recRes.data.results.filter(m => !isComingSoon(m.release_date || m.first_air_date));
             
-            // Map type for dynamic linking
             const formattedRecs = releasedRecs.map(m => ({
               ...m, 
               media_type: m.media_type || itemType
@@ -165,7 +159,7 @@ function App() {
     fetchUserData();
   }, [currentUser]);
 
-  // 3. Fetch Movie Details (Dynamically for Movie or TV)
+  // 3. Fetch Movie Details
   useEffect(() => {
     if (selectedMovie) {
       async function fetchDetails() {
@@ -180,7 +174,6 @@ function App() {
           
           setCast(cRes.data.cast.slice(0, 6));
           
-          // FILTER: Similar movies row can only contain released movies
           const releasedSimilar = sRes.data.results.filter(m => !isComingSoon(m.release_date || m.first_air_date));
           const formattedSimilar = releasedSimilar.map(m => ({
             ...m, 
@@ -201,7 +194,6 @@ function App() {
     if (searchQuery.trim()) {
       setIsSearching(true);
       const res = await axios.get(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${searchQuery}`);
-      // FILTER: Search results can only contain released movies
       const releasedSearch = res.data.results.filter(m => !isComingSoon(m.release_date || m.first_air_date));
       setSearchResults(releasedSearch);
     } else {
@@ -247,12 +239,12 @@ function App() {
             backdrop_path: m.backdrop_path,
             poster_path: m.poster_path,
             timestamp: new Date().toISOString(),
-            media_type: itemType // Ensures it re-opens as the correct type
+            media_type: itemType
           });
 
           await updateDoc(userRef, {
             continueWatching: currentCW.slice(0, 10),
-            watchHistory: arrayUnion({ id: m.id, type: itemType }) // Save object history
+            watchHistory: arrayUnion({ id: m.id, type: itemType })
           });
           
           setContinueWatching(currentCW.slice(0, 10));
@@ -286,7 +278,6 @@ function App() {
     if (genreId) {
       try {
         const res = await axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${genreId}`);
-        // FILTER: Mood recommendations can only contain released movies
         const releasedMood = res.data.results.filter(m => !isComingSoon(m.release_date || m.first_air_date));
         setMoodMovies(releasedMood.slice(0, 12));
       } catch (e) {
@@ -605,6 +596,7 @@ function App() {
                   </button>
                 </div>
                 
+                {/* FORGOT PASSWORD LINK */}
                 <div className="text-right">
                   <span onClick={() => setAuthView('forgotPassword')} className="text-sm text-red-500 cursor-pointer font-semibold hover:underline">
                     Forgot Password?
@@ -972,13 +964,20 @@ function App() {
             </button>
 
             {isPlayerOpen ? (
-              <div className="aspect-video w-full bg-black">
-                {/* DYNAMIC PLAYER: TV k liye vidsrc.net aur Movies k liye multiembed */}
+              /* MOBILE FIX: Added min-h-[250px] to prevent height collapse on phones */
+              <div className="aspect-video w-full bg-black min-h-[250px] md:min-h-[500px]">
+                {/* MOBILE FIX: Changed server to embed.su for both TV and Movies as it is much lighter and mobile-friendly */}
                 <iframe 
                   src={selectedMovie.media_type === 'tv' || selectedMovie.first_air_date 
-                        ? `https://vidsrc.me/embed/tv?tmdb=${selectedMovie.id}` 
-                        : `https://multiembed.mov/?video_id=${selectedMovie.id}&tmdb=1`} 
-                  width="100%" height="100%" allowFullScreen className="w-full h-full" 
+                        ? `https://embed.su/embed/tv/${selectedMovie.id}` 
+                        : `https://embed.su/embed/movie/${selectedMovie.id}`} 
+                  width="100%" 
+                  height="100%" 
+                  allowFullScreen 
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  frameBorder="0"
+                  scrolling="no"
+                  className="w-full h-full" 
                 />
               </div>
             ) : (
