@@ -1026,10 +1026,12 @@ function App() {
                   src={selectedMovie.media_type === 'tv' || selectedMovie.first_air_date 
                         ? `https://vidsrc.in/embed/tv/${selectedMovie.id}` 
                         : `https://multiembed.mov/?video_id=${selectedMovie.id}&tmdb=1`} 
+                  width="100%"
+                  height="100%"
                   className="absolute top-0 left-0 w-full h-full"
-                  allowFullScreen={true}
-                  webkitallowfullscreen="true"
-                  mozallowfullscreen="true"
+                  allowFullScreen
+                  webkitAllowFullScreen
+                  mozAllowFullScreen
                   allow="autoplay; fullscreen; picture-in-picture"
                   frameBorder="0"
                   scrolling="no"
