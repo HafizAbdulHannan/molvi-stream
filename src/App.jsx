@@ -335,7 +335,7 @@ function App() {
 
   const completeSignUp = async () => {
     if (signUpData.password !== signUpData.confirmPassword) {
-      alert("Passwords match nahi ho rahay!");
+      alert("Passwords do not match!");
       return;
     }
     
@@ -357,7 +357,7 @@ function App() {
 
       await setDoc(doc(db, "users", signUpData.email), newUser, { merge: true });
       
-      alert("Account register ho gaya hai! Verification link aapki email par bhej diya gaya hai. Log in karne se pehle apna inbox check karein.");
+      alert("Account is created! Please verify your email before logging in. Check your inbox or spam folder.");
       
       setSignUpData({ 
         firstName: '', middleName: '', lastName: '', 
@@ -373,11 +373,11 @@ function App() {
     } catch (error) {
       console.error(error);
       if (error.code === 'auth/email-already-in-use') {
-        alert("Is email par pehle se account bana hua hai.");
+        alert("This email is already in use.");
       } else if (error.code === 'auth/weak-password') {
-        alert("Password kam az kam 6 characters ka hona chahiye.");
+        alert("Password should be at least 6 characters long.");
       } else {
-        alert("Signup failed. Internet connection check karein.");
+        alert("Signup failed. Error: " + error.message);
       }
     }
   };
@@ -388,7 +388,7 @@ function App() {
       const userCredential = await signInWithEmailAndPassword(auth, loginData.email, loginData.password);
       
       if (!userCredential.user.emailVerified) {
-        alert("Aapne abhi tak apna email verify nahi kiya. Please inbox ya spam folder check karein.");
+        alert("You have not verified your email yet. Please check your inbox or spam folder.");
         await signOut(auth);
         return;
       }
@@ -400,27 +400,27 @@ function App() {
       
     } catch (error) {
       console.error(error);
-      alert("Email ya Password ghalat hai!");
+      alert("Email or Password is incorrect!");
     }
   };
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     if (!resetEmail) {
-      alert("Pehle apna email address likhein!");
+      alert("Please enter your email address first!");
       return;
     }
     try {
       await sendPasswordResetEmail(auth, resetEmail);
-      alert("Password reset link aapki email par bhej diya gaya hai! Apna inbox check karein.");
+      alert("Password reset link has been sent to your email address. Please check your inbox or spam folder.");
       setAuthView('login');
       setResetEmail("");
     } catch (error) {
       console.error(error);
       if (error.code === 'auth/user-not-found') {
-        alert("Is email ka koi account nahi mila.");
+        alert(" No user found with this email address.");
       } else {
-        alert("Reset link bhejne mein masla aya: " + error.message);
+        alert("Error: " + error.message);
       }
     }
   };
@@ -436,7 +436,7 @@ function App() {
   };
 
   const handleDeleteAccount = async () => {
-    const confirmDelete = window.confirm("Kya aap waqai apna account delete karna chahte hain? Aapki watch history aur sab data hamesha ke liye khatam ho jayega.");
+    const confirmDelete = window.confirm("Are you sure you want to delete your account? Your watch history and all data will be permanently deleted.");
     
     if (!confirmDelete) {
       return;
@@ -455,14 +455,14 @@ function App() {
       setCurrentUser(null);
       setAuthView(null);
       setIsDropdownOpen(false);
-      alert("Aapka account aur data mukammal taur par delete ho gaya hai.");
+      alert("Your account and data have been permanently deleted.");
 
     } catch (error) {
       console.error(error);
       if (error.code === 'auth/requires-recent-login') {
-        alert("Account delete karne ke liye security verification zaroori hai. Please pehle logout karein, dobara login karein, aur phir try karein.");
+        alert(" For security reasons, please log in again before deleting your account.");
       } else {
-        alert("Account delete karne mein masla aya.");
+        alert(" Error deleting account: " + error.message);
       }
     }
   };
@@ -488,11 +488,11 @@ function App() {
       
       setCurrentUser(updatedUser);
 
-      alert("Profile update ho gayi hai!");
+      alert("Profile updated successfully!");
       setAuthView(null);
     } catch (error) {
       console.error(error);
-      alert("Profile update karne mein masla aya.");
+      alert("Error updating profile: " + error.message);
     }
   };
 
@@ -512,10 +512,10 @@ function App() {
           message: feedbackMsg 
         }),
       });
-      alert("Aapka message bhej diya gaya hai!");
+      alert("Thank you for your feedback! We appreciate your input.");
       setFeedbackMsg("");
     } catch (error) {
-      alert("Message bhejne mein masla hua.");
+      alert("Error sending feedback: " + error.message);
     }
   };
 
@@ -544,10 +544,10 @@ function App() {
       {showAdPrompt && (
         <div className="fixed inset-0 z-[9999] bg-black/95 flex flex-col items-center justify-center p-6 text-center backdrop-blur-xl">
           <h2 className="text-3xl md:text-5xl font-black text-white mb-6 drop-shadow-2xl tracking-tight">
-            Welcome to <span className="text-red-600">MOLVI-Stream</span>
+            Welcome to <span className="text-red-600">MOVIE-Stream</span>
           </h2>
           <p className="text-gray-300 text-sm md:text-lg mb-10 max-w-xl leading-relaxed">
-            Humari is free streaming service ko support karne ke liye, baraye meharbani din mein sirf ek dafa ad dekhein. Click karne ke baad ad naye tab mein khulega aur website aap ke liye unlock ho jayegi.
+            To support our free streaming service, please watch an ad once a day. Click the button below to watch the ad and unlock the website.
           </p>
           <button 
             onClick={handleAdClick}
@@ -561,7 +561,7 @@ function App() {
       {/* NAVBAR */}
       <nav className={`fixed top-0 w-full p-4 z-[100] flex justify-between items-center backdrop-blur-sm ${theme === 'dark' ? 'bg-gradient-to-b from-black/90 to-transparent' : 'bg-white/90 shadow-md'}`}>
         <h1 className="text-red-600 text-2xl md:text-4xl font-black cursor-pointer tracking-tighter" onClick={() => setIsSearching(false)}>
-          MOLVI-Stream
+          MOVIE-Stream
         </h1>
         
         <div className="flex flex-col items-end gap-1">
@@ -675,7 +675,7 @@ function App() {
               <div className="space-y-6">
                 <h2 className="text-3xl font-bold mb-2">Reset Password</h2>
                 <p className={`text-sm mb-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Apna registered email darj karein, hum aapko password reset link bhejenge.
+                  Enter your registered email address and we will send you a link to reset your password.
                 </p>
                 <input 
                   type="email" 
@@ -738,7 +738,7 @@ function App() {
             {authView === 'signup3' && (
               <div className="space-y-4">
                 <h2 className="text-2xl font-bold mb-2">Final Step: Password</h2>
-                <p className="text-sm text-gray-400 mb-2">Password kam az kam 6 characters ka hona chahiye.</p>
+                <p className="text-sm text-gray-400 mb-2">Password must be at least 6 characters long.</p>
                 
                 <div className="relative">
                   <input 
@@ -777,7 +777,7 @@ function App() {
                 </div>
 
                 {signUpData.confirmPassword.length > 0 && signUpData.password !== signUpData.confirmPassword && (
-                  <p className="text-red-500 text-sm font-semibold">Passwords match nahi ho rahay!</p>
+                  <p className="text-red-500 text-sm font-semibold">Passwords do not match!</p>
                 )}
 
                 <button 
@@ -854,7 +854,7 @@ function App() {
                     <div className={`p-4 rounded-lg border border-red-900/50 bg-red-900/10 mt-6`}>
                       <h3 className="font-bold mb-2 text-red-500 flex items-center gap-2">Danger Zone</h3>
                       <p className={`text-xs mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Apna account aur sara data hamesha ke liye delete karein.
+                        Delete your account and all associated data.
                       </p>
                       <button 
                         onClick={handleDeleteAccount} 
