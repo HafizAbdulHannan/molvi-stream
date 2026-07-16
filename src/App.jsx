@@ -717,7 +717,7 @@ function App() {
                 <input type="text" name="country" placeholder="Country" value={signUpData.country} onChange={handleSignUpChange} className={`w-full p-2 rounded ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100 border'}`} />
                 <input type="number" name="age" placeholder="Age" value={signUpData.age} onChange={handleSignUpChange} className={`w-full p-2 rounded ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100 border'}`} />
                 <input type="date" name="dob" value={signUpData.dob} onChange={handleSignUpChange} className={`w-full p-2 rounded ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100 border'}`} />
-                <select name="gender" value={signUpData.gender} onChange={handleSignUpChange} className={`w-full p-2 rounded ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100 border'}`} />
+                <select name="gender" value={signUpData.gender} onChange={handleSignUpChange} className={`w-full p-2 rounded ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100 border'}`}>
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -1027,8 +1027,10 @@ function App() {
                         ? `https://vidsrc.in/embed/tv/${selectedMovie.id}` 
                         : `https://multiembed.mov/?video_id=${selectedMovie.id}&tmdb=1`} 
                   className="absolute top-0 left-0 w-full h-full"
-                  allowFullScreen={true}
-                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen="true"
+                  webkitallowfullscreen="true"
+                  mozallowfullscreen="true"
+                  allow="autoplay; fullscreen"
                   frameBorder="0"
                   scrolling="no"
                   title="Video Player"
