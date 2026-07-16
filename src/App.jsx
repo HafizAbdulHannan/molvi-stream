@@ -1025,7 +1025,7 @@ function App() {
                 <iframe 
                   src={selectedMovie.media_type === 'tv' || selectedMovie.first_air_date 
                         ? `https://vidsrc.in/embed/tv/${selectedMovie.id}` 
-                        : `https://vidsrc.in/embed/tv/${selectedMovie.id}&tmdb=1`} 
+                        : `https://vidsrc.in/embed/movie/${selectedMovie.id}&tmdb=1`} 
                   className="absolute top-0 left-0 w-full h-full"
                   allowFullScreen="true"
                   webkitallowfullscreen="true"
